@@ -3,6 +3,7 @@ import { Employee } from '../models/Employee';
 import { Funder } from '../models/Funder';
 import { Allocation } from '../models/Allocation';
 import { CollectedMoneyFromFunder, CollectedMoneyFromMonth, EmployeeAllocation } from '../models/EmployeeAllocation';
+import AllocateDialog from './Dialog';
 interface EmployeeTableProps {
   employees: Employee[];
   funders: Funder[];
@@ -41,19 +42,15 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, funders, onAll
       months: new Map<number, CollectedMoneyFromMonth>(Array.from({ length: 12 }, (_, idx) => [idx, {remainingAmount: emp.salary, collectedFromFunders: [] }]))
     }))
   );
-  const [selectedFunderId, setSelectedFunderId] = useState<string>('');
-  const [percentage, setPercentage] = useState<number>(0);
   const [error, setError] = useState<string>('');
 
 
   const handleCellClick = (employee: EmployeeAllocation, monthIdx: number) => {
     setDialog({ open: true, employee, monthIdx });
-    setSelectedFunderId('');
-    setPercentage(0);
     setError('');
   };
 
-  const handleAllocate = () => {
+  const handleAllocate = (percentage: number, selectedFunderId: string): void => {
     if (!dialog.employee || dialog.monthIdx === null) return;
 
     const employee = allocations.find(a => a.employeeId === dialog.employee!!.employeeId);
@@ -163,33 +160,15 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, funders, onAll
         </tbody>
       </table>
       {dialog.open && dialog.employee && dialog.monthIdx !== null && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center'
-        }}>
-          <div style={{ background: '#fff', padding: 20, borderRadius: 8, minWidth: 300 }}>
-            <h3>Allocate for {dialog.employee.employeeName} - {monthNames[dialog.monthIdx]}</h3>
-            <div>
-              <label>Funder: </label>
-              <select value={selectedFunderId} onChange={e => setSelectedFunderId(e.target.value)}>
-                <option value="">Select funder</option>
-                {funders.map(f =>
-                  <option key={f.id} value={f.id}>
-                    {f.name} (Rem: {f.amount})
-                  </option>
-                )}
-              </select>
-            </div>
-            <div>
-              <label>Percentage: </label>
-              <input type="number" value={percentage} min={1} max={100}
-                onChange={e => setPercentage(Number(e.target.value))} />
-            </div>
-            {error && <div style={{ color: 'red' }}>{error}</div>}
-            <button onClick={handleAllocate}>Allocate</button>
-            <button onClick={() => setDialog({ open: false, employee: null, monthIdx: null })}>Cancel</button>
-          </div>
-        </div>
+        <AllocateDialog
+          employeeName={dialog.employee.employeeName}
+          monthIdx={dialog.monthIdx}
+          funders={funders}
+          monthNames={monthNames}
+          error={error}
+          onCancel={() => setDialog({ open: false, employee: null, monthIdx: null })}
+          handleAllocate={handleAllocate}
+        />
       )}
     </div>
   );
