@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { Employee } from '../models/Employee';
 import { Funder } from '../models/Funder';
 import { Allocation } from '../models/Allocation';
-import { CollectedMoneyFromFunder, CollectedMoneyFromMonth, EmployeeAllocation } from '../models/EmployeeAllocation';
+import {
+  CollectedMoneyFromFunder,
+  CollectedMoneyFromMonth,
+  EmployeeAllocation,
+} from '../models/EmployeeAllocation';
 import AllocateDialog from './Dialog';
 interface EmployeeTableProps {
   employees: Employee[];
@@ -11,8 +15,18 @@ interface EmployeeTableProps {
 }
 
 const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 function isMonthInRange(monthIdx: number, funder: Funder) {
@@ -35,15 +49,19 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, funders, onAll
   }>({ open: false, employee: null, monthIdx: null });
   // set initial state for allocations
   const [allocations, setAllocations] = useState<EmployeeAllocation[]>(
-    employees.map(emp => ({
+    employees.map((emp) => ({
       employeeId: emp.id,
       employeeName: emp.name,
       salary: emp.salary,
-      months: new Map<number, CollectedMoneyFromMonth>(Array.from({ length: 12 }, (_, idx) => [idx, {remainingAmount: emp.salary, collectedFromFunders: [] }]))
-    }))
+      months: new Map<number, CollectedMoneyFromMonth>(
+        Array.from({ length: 12 }, (_, idx) => [
+          idx,
+          { remainingAmount: emp.salary, collectedFromFunders: [] },
+        ]),
+      ),
+    })),
   );
   const [error, setError] = useState<string>('');
-
 
   const handleCellClick = (employee: EmployeeAllocation, monthIdx: number) => {
     setDialog({ open: true, employee, monthIdx });
@@ -53,9 +71,9 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, funders, onAll
   const handleAllocate = (percentage: number, selectedFunderId: string): void => {
     if (!dialog.employee || dialog.monthIdx === null) return;
 
-    const employee = allocations.find(a => a.employeeId === dialog.employee!!.employeeId);
+    const employee = allocations.find((a) => a.employeeId === dialog.employee!!.employeeId);
 
-    const funder = funders.find(f => f.id === selectedFunderId);
+    const funder = funders.find((f) => f.id === selectedFunderId);
     if (!funder) {
       setError('Please select a funder.');
       return;
@@ -74,19 +92,22 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, funders, onAll
       return;
     }
     const existingAllocations = employee?.months.get(dialog.monthIdx)!!;
-    const collectedMoneyFromFunder : CollectedMoneyFromFunder = {
+    const collectedMoneyFromFunder: CollectedMoneyFromFunder = {
       funderId: funder.id,
       funderName: funder.name,
       amount,
       percentage,
-    }
+    };
 
-    employee!.months.set(dialog.monthIdx, {remainingAmount: existingAllocations.remainingAmount - amount, collectedFromFunders: [...existingAllocations.collectedFromFunders, collectedMoneyFromFunder]});
+    employee!.months.set(dialog.monthIdx, {
+      remainingAmount: existingAllocations.remainingAmount - amount,
+      collectedFromFunders: [...existingAllocations.collectedFromFunders, collectedMoneyFromFunder],
+    });
 
-    const updatedEmployee = allocations.map(e=>{
-      if(e.employeeId === employee?.employeeId) return {...employee};
+    const updatedEmployee = allocations.map((e) => {
+      if (e.employeeId === employee?.employeeId) return { ...employee };
       else return e;
-    })
+    });
 
     setAllocations(updatedEmployee);
     onAllocate({
@@ -99,24 +120,25 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, funders, onAll
   return (
     <div>
       <h2>Employee Funding Allocation</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Salary</th>
-            {monthNames.map((m, idx) => <th key={idx}>{m}</th>)}
-        </tr>
-      </thead>
-      <tbody>
-          {allocations.map(emp => {
-            
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Salary</th>
+            {monthNames.map((m, idx) => (
+              <th key={idx}>{m}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {allocations.map((emp) => {
             return (
               <tr key={emp.employeeId}>
                 <td>{emp.employeeName}</td>
                 <td>{emp.salary}</td>
                 {Array.from(emp.months.entries()).map(([monthIdx, value]) => {
-                  const {collectedFromFunders, remainingAmount } = value;
-                  
+                  const { collectedFromFunders, remainingAmount } = value;
+
                   // If full salary is collected for this month, do not show remaining or allocate button
                   if (remainingAmount <= 0) {
                     return (
@@ -125,7 +147,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, funders, onAll
                           {collectedFromFunders.map((a, idx) => {
                             return (
                               <div key={idx}>
-                                { `${a.funderName}`} &rarr; {a.amount}
+                                {`${a.funderName}`} &rarr; {a.amount}
                               </div>
                             );
                           })}
@@ -141,13 +163,15 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, funders, onAll
                         {collectedFromFunders.map((a, idx) => {
                           return (
                             <div key={idx}>
-                              {a.funderName}  &rarr; {a.amount}
+                              {a.funderName} &rarr; {a.amount}
                             </div>
                           );
                         })}
-                        {(remainingAmount > 0) && (
+                        {remainingAmount > 0 && (
                           <>
-                            <button onClick={() => handleCellClick(emp, monthIdx)}>Allocate({remainingAmount})</button>
+                            <button onClick={() => handleCellClick(emp, monthIdx)}>
+                              Allocate({remainingAmount})
+                            </button>
                           </>
                         )}
                       </div>

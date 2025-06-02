@@ -58,6 +58,7 @@ funding-allocation-app
 1. Start the development server:
    ```
    npm start
+   npm run format
    ```
 2. Open your browser and navigate to `http://localhost:3000` to view the application.
 

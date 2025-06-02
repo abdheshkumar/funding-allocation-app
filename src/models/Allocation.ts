@@ -1,4 +1,4 @@
 export interface Allocation {
-    funderId: string;
-    allocatedAmount: number;
+  funderId: string;
+  allocatedAmount: number;
 }

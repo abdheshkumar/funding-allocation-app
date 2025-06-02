@@ -7,7 +7,6 @@ interface FunderTableProps {
 }
 
 const FunderTable: React.FC<FunderTableProps> = ({ funders }) => {
-
   // Use the expected column shape for SmartTable
   const columns = [
     { header: 'Funder Name', accessor: 'name' as keyof Funder },
@@ -29,7 +28,6 @@ const FunderTable: React.FC<FunderTableProps> = ({ funders }) => {
       </thead>
       <tbody>
         {funders.map((funder, idx) => {
-      
           return (
             <tr key={funder.id}>
               {columns.map((col, colIdx) => {
@@ -39,13 +37,13 @@ const FunderTable: React.FC<FunderTableProps> = ({ funders }) => {
                   (col.accessor === 'startDate' || col.accessor === 'endDate') &&
                   value instanceof Date
                 ) {
-                  displayValue = value.toLocaleString('default', { month: 'short', year: 'numeric' });
+                  displayValue = value.toLocaleString('default', {
+                    month: 'short',
+                    year: 'numeric',
+                  });
                 }
-                return (
-                  <td key={colIdx}>{String(displayValue)}</td>
-                );
+                return <td key={colIdx}>{String(displayValue)}</td>;
               })}
-          
             </tr>
           );
         })}

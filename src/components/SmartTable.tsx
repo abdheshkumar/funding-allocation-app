@@ -19,9 +19,7 @@ const SmartTable = <T,>({ data, columns }: SmartTableProps<T>) => {
         {data.map((row, rowIndex) => (
           <tr key={rowIndex}>
             {columns.map((column) => (
-              <td key={column.accessor.toString()}>
-                {String(row[column.accessor])}
-              </td>
+              <td key={column.accessor.toString()}>{String(row[column.accessor])}</td>
             ))}
           </tr>
         ))}
